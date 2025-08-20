@@ -14,7 +14,7 @@ PySEBAL now supports **CSV input files** for automated timeseries evapotranspira
 ### Quick Start with CSV Input
 
 1. **Prepare your CSV file** with Landsat images and weather data:
-```bash
+```bash 
 # Use the provided template
 cp sample_input_timeseries.csv my_data.csv
 # Edit with your actual data paths and weather measurements
