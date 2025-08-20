@@ -27,7 +27,7 @@ from math import sin, cos, pi, tan
 import time
 import subprocess
 import numpy.polynomial.polynomial as poly	
-from openpyxl import load_workbook
+# Excel dependency removed - CSV only support
 from pyproj import Proj, transform
 import warnings
 import pandas as pd
@@ -140,28 +140,22 @@ def load_csv_as_workbook(csv_file, row_index):
         print(f"Error loading CSV file: {e}")
         return None
 
-def SEBALcode(number,inputExcel):
+def SEBALcode(number,inputCSV):
   
     # Do not show warnings
     warnings.filterwarnings('ignore')  
     
-    # Check if input is CSV or Excel file
-    if inputExcel.lower().endswith('.csv'):
-        # Handle CSV input
-        wb = load_csv_as_workbook(inputExcel, number - 2)  # Convert to 0-based index
-        if wb is None:
-            print("Error: Could not load CSV file")
-            return False
-        print('Using CSV input file')
-    else:
-        # Handle Excel input (original behavior)
-        wb = load_workbook(inputExcel)
-        print('Using Excel input file')
+    # Handle CSV input only
+    wb = load_csv_as_workbook(inputCSV, number - 2)  # Convert to 0-based index
+    if wb is None:
+        print("Error: Could not load CSV file")
+        return False
+    print('Using CSV input file')
     
     # Open the General_Input sheet			
     ws = wb['General_Input']
  			
-    # Extract the input and output folder, and Image type from the excel file			
+    # Extract the input and output folder, and Image type from the CSV file			
     input_folder = r"%s" %str(ws['B%d' %number].value)
     output_folder = r"%s" %str(ws['C%d' %number].value)
     Image_Type = int(ws['D%d' %number].value)           # Type of Image (1=Landsat & 2 = VIIRS & GLOBA-V)     
@@ -174,7 +168,7 @@ def SEBALcode(number,inputExcel):
     #filename_logfile = os.path.join(output_folder, 'log.txt')	
     #sys.stdout = open(filename_logfile, 'w')		
  		
-    # Extract the Path to the DEM map from the excel file
+    # Extract the Path to the DEM map from the CSV file
     DEM_fileName = r"%s" %str(ws['E%d' %number].value) #'DEM_HydroShed_m'
     # Print data used from sheet General_Input
     print ('.................................................................. ')
@@ -193,7 +187,7 @@ def SEBALcode(number,inputExcel):
         # Open the VIIRS_PROBAV_Input sheet					
         ws = wb['MODIS_Input']
         
-        # Extract the name of the thermal and quality VIIRS image from the excel file	
+        # Extract the name of the thermal and quality VIIRS image from the CSV file	
         Name_MODIS_Image_Ref = str(ws['B%d' %number].value)                #reflectance
         Name_MODIS_Image_NDVI = str(ws['D%d' %number].value)               #ndvi
         Name_MODIS_Image_LST = str(ws['C%d' %number].value)                #land surface temperature
@@ -203,11 +197,11 @@ def SEBALcode(number,inputExcel):
         src_FileName_NDVI = os.path.join(input_folder, '%s.hdf' %Name_MODIS_Image_NDVI)                                       
         src_FileName_Ref = os.path.join(input_folder, '%s.hdf' %Name_MODIS_Image_Ref)  
     
-        # Calibartion constants Hot Pixels extracted from the excel file 
+        # Calibartion constants Hot Pixels extracted from the CSV file 
         # Old constants now put as zero
         Hot_Pixel_Constant = 0        # Hot Pixel Value = Mean_Hot_Pixel + Hot_Pixel_Constant * Std_Hot_Pixel (only for VIIRS images)
         
-        # Calibartion constants Cold Pixels from the excel file 					
+        # Calibartion constants Cold Pixels from the CSV file 					
         Cold_Pixel_Constant = 0        # Cold Pixel Value = Mean_Cold_Pixel + Cold_Pixel_Constant * Std_Cold_Pixel (only for VIIRS images)
         
         # Pixel size of the model
@@ -231,17 +225,17 @@ def SEBALcode(number,inputExcel):
         # Open the VIIRS_PROBAV_Input sheet					
         ws = wb['VIIRS_PROBAV_Input']
 							
-        # Extract the name of the thermal and quality VIIRS image from the excel file	
+        # Extract the name of the thermal and quality VIIRS image from the CSV file	
         Name_VIIRS_Image_TB = '%s' %str(ws['B%d' %number].value)
         Name_VIIRS_Image_QC = '%s' %str(ws['C%d' %number].value)
     
-        # Extract the name to the PROBA-V image from the excel file	
+        # Extract the name to the PROBA-V image from the CSV file	
         Name_PROBAV_Image = '%s' %str(ws['D%d' %number].value)    # Must be a tiff file 
  
-        # Calibartion constants Hot Pixels extracted from the excel file 
+        # Calibartion constants Hot Pixels extracted from the CSV file 
         Hot_Pixel_Constant = 0          # Hot Pixel Value = Mean_Hot_Pixel + Hot_Pixel_Constant * Std_Hot_Pixel (only for VIIRS images)
         
-        # Calibartion constants Cold Pixels from the excel file 					
+        # Calibartion constants Cold Pixels from the CSV file 					
         Cold_Pixel_Constant = 0        # Cold Pixel Value = Mean_Cold_Pixel + Cold_Pixel_Constant * Std_Cold_Pixel (only for VIIRS images)
         
         # Pixel size of the model
@@ -264,19 +258,19 @@ def SEBALcode(number,inputExcel):
         # Open the Landsat_Input sheet				
         ws = wb['Landsat_Input']		
       
-        # Extract Landsat name, number and amount of thermal bands from excel file 
+        # Extract Landsat name, number and amount of thermal bands from CSV file 
         Name_Landsat_Image = str(ws['B%d' %number].value)    # From glovis.usgs.gov
         Landsat_nr = int(ws['C%d' %number].value)            # Type of Landsat (LS) image used (LS5, LS7, or LS8)
         Bands_thermal = int(ws['D%d' %number].value)         # Number of LS bands to use to retrieve land surface 
                                     
                                                              # temperature: 1 = Band 6 for LS_5 & 7, Band 10 for LS_8 (optional)
-        # Calibartion constants Hot Pixels from the excel file 
-        # Old constants, has been changed to other inputs in excel sheet
+        # Calibartion constants Hot Pixels from the CSV file 
+        # Old constants, has been changed to other inputs in CSV file
         Hot_Pixel_Constant = 0          # Hot Pixel Value = Mean_Hot_Pixel + Hot_Pixel_Constant * Std_Hot_Pixel (only for Landsat images)
   
-        # Calibartion constants Cold Pixels from the excel file 
+        # Calibartion constants Cold Pixels from the CSV file 
         Cold_Pixel_Constant = 0         # Cold Pixel Value = Mean_Cold_Pixel + Cold_Pixel_Constant * Std_Cold_Pixel (only for Landsat images)
-        # NEW variables from excel sheet (Landsat_Input)
+        # NEW variables from CSV file (Landsat_Input)
         NDVIhot_low1 = float(ws['G%d' %number].value)            # Lower NDVI treshold for hot pixels
         NDVIhot_high1 = float(ws['H%d' %number].value)              # Higher NDVI treshold for hot pixels
         tcoldmin1 = float(ws['E%d' %number].value)
@@ -974,7 +968,7 @@ def SEBALcode(number,inputExcel):
             Temp_inst_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'Temp_inst_input.tif')
             Temp_inst = Reshape_Reproject_Input_data(Temp_inst_name, Temp_inst_fileName, proyDEM_fileName)
         except:
-            print('ERROR: Check the instantenious Temperature input path in the meteo excel tab') 
+            print('ERROR: Check the instantenious Temperature input path in the meteo CSV data') 
                 
     # 6b) Daily Temperature         
     if Temp_24_kind_of_data == 1:
@@ -982,7 +976,7 @@ def SEBALcode(number,inputExcel):
             Temp_24_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'Temp_24_input.tif')
             Temp_24 = Reshape_Reproject_Input_data(Temp_24_name, Temp_24_fileName, proyDEM_fileName)
         except:
-            print('ERROR: Check the daily Temperature input path in the meteo excel tab') 
+            print('ERROR: Check the daily Temperature input path in the meteo CSV data') 
                 
     # 6c) Daily Relative Humidity       
     if RH_24_kind_of_data == 1:
@@ -990,7 +984,7 @@ def SEBALcode(number,inputExcel):
             RH_24_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'RH_24_input.tif')
             RH_24 = Reshape_Reproject_Input_data(RH_24_name, RH_24_fileName, proyDEM_fileName)
         except:
-            print('ERROR: Check the instantenious Relative Humidity input path in the meteo excel tab') 
+            print('ERROR: Check the instantenious Relative Humidity input path in the meteo CSV data') 
 
      # 6d) Instantaneous Relative Humidity      
     if RH_inst_kind_of_data == 1:
@@ -998,7 +992,7 @@ def SEBALcode(number,inputExcel):
             RH_inst_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'RH_inst_input.tif')
             RH_inst = Reshape_Reproject_Input_data(RH_inst_name, RH_inst_fileName, proyDEM_fileName)  
         except:
-            print('ERROR: Check the daily Relative Humidity input path in the meteo excel tab') 
+            print('ERROR: Check the daily Relative Humidity input path in the meteo CSV data') 
  
      # 6e) Daily wind speed      
     if Wind_24_kind_of_data == 1:
@@ -1007,7 +1001,7 @@ def SEBALcode(number,inputExcel):
             Wind_24 = Reshape_Reproject_Input_data(Wind_24_name, Wind_24_fileName, proyDEM_fileName)
             Wind_24[Wind_24 < 1.5] = 1.5
         except:
-            print('ERROR: Check the daily wind input path in the meteo excel tab') 
+            print('ERROR: Check the daily wind input path in the meteo CSV data') 
   
      # 6f) Instantaneous wind speed              
     if Wind_inst_kind_of_data == 1:
@@ -1016,7 +1010,7 @@ def SEBALcode(number,inputExcel):
             Wind_inst = Reshape_Reproject_Input_data(Wind_inst_name, Wind_inst_fileName, proyDEM_fileName)  
             Wind_inst[Wind_inst < 1.5] = 1.5
         except:
-            print('ERROR: Check the instantenious wind input path in the meteo excel tab') 
+            print('ERROR: Check the instantenious wind input path in the meteo CSV data') 
 
     # 6g) Daily incoming Radiation      
     if Method_Radiation_24 == 1:    
@@ -1025,7 +1019,7 @@ def SEBALcode(number,inputExcel):
                 Net_radiation_daily_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'Ra_24_input.tif')
                 Rs_24 = Reshape_Reproject_Input_data(Rs_24_name, Net_radiation_daily_fileName, proyDEM_fileName)
             except:
-                print('ERROR: Check the daily net radiation input path in the meteo excel tab') 
+                print('ERROR: Check the daily net radiation input path in the meteo CSV data') 
  
     # 6h) Instantaneous incoming Radiation    
     if Method_Radiation_inst == 1:            
@@ -1034,7 +1028,7 @@ def SEBALcode(number,inputExcel):
                 Net_radiation_inst_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'Ra_in_inst_input.tif')
                 Rs_in_inst = Reshape_Reproject_Input_data(Rs_in_inst_name, Net_radiation_inst_fileName, proyDEM_fileName)
             except:
-                print('ERROR: Check the instanenious net radiation input path in the meteo excel tab') 
+                print('ERROR: Check the instanenious net radiation input path in the meteo CSV data') 
  
     # 6i) Daily Transmissivity
     if Method_Radiation_24 == 2:      
@@ -1043,7 +1037,7 @@ def SEBALcode(number,inputExcel):
                 Transm_24_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'Transm_24_input.tif')
                 Transm_24 = Reshape_Reproject_Input_data(Transm_24_name, Transm_24_fileName, proyDEM_fileName)
             except:
-                print('ERROR: Check the daily transmissivity input path in the meteo excel tab') 
+                print('ERROR: Check the daily transmissivity input path in the meteo CSV data') 
 
     # 6j) Instantaneous Transmissivity
     if Method_Radiation_inst == 2:     
@@ -1052,7 +1046,7 @@ def SEBALcode(number,inputExcel):
                 Transm_inst_fileName = os.path.join(output_folder, 'Output_radiation_balance', 'Transm_inst_input.tif')
                 Transm_inst = Reshape_Reproject_Input_data(Transm_inst_name, Transm_inst_fileName, proyDEM_fileName)
             except:
-                print('ERROR: Check the instantenious transmissivity input path in the meteo excel tab') 
+                print('ERROR: Check the instantenious transmissivity input path in the meteo CSV data') 
  
     # 6k) Theta saturated topsoil    
     if Theta_sat_top_kind_of_data == 1:
@@ -1060,7 +1054,7 @@ def SEBALcode(number,inputExcel):
            Theta_sat_top_fileName = os.path.join(output_folder, 'Output_temporary','Theta_sat_top_input.tif')
            Theta_sat_top = Reshape_Reproject_Input_data(Theta_sat_top_name, Theta_sat_top_fileName, proyDEM_fileName)
         except:
-           print('ERROR: Check the saturated top soil input path in the soil excel tab') 
+           print('ERROR: Check the saturated top soil input path in the soil CSV data') 
 
     # 6l) Theta saturated subsoil          
     if Theta_sat_sub_kind_of_data == 1:
@@ -1068,7 +1062,7 @@ def SEBALcode(number,inputExcel):
             Theta_sat_sub_fileName = os.path.join(output_folder, 'Output_temporary','Theta_sat_sub_input.tif')
             Theta_sat_sub  =Reshape_Reproject_Input_data(Theta_sat_sub_name,Theta_sat_sub_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the saturated sub soil input path in the soil excel tab') 
+            print('ERROR: Check the saturated sub soil input path in the soil CSV data') 
                
     # 6m) Theta residual topsoil        
     if Theta_res_top_kind_of_data == 1:
@@ -1076,7 +1070,7 @@ def SEBALcode(number,inputExcel):
             Theta_res_top_fileName = os.path.join(output_folder, 'Output_temporary','Theta_res_top_input.tif')
             Theta_res_top=Reshape_Reproject_Input_data(Theta_res_top_name,Theta_res_top_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the residual top soil input path in the soil excel tab') 
+            print('ERROR: Check the residual top soil input path in the soil CSV data') 
 
     # 6n) Theta residual subsoil    
     if Theta_res_sub_kind_of_data == 1:
@@ -1084,7 +1078,7 @@ def SEBALcode(number,inputExcel):
             Theta_res_sub_fileName = os.path.join(output_folder, 'Output_temporary','Theta_res_sub_input.tif')
             Theta_res_sub=Reshape_Reproject_Input_data(Theta_res_sub_name,Theta_res_sub_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the residual sub soil input path in the soil excel tab') 
+            print('ERROR: Check the residual sub soil input path in the soil CSV data') 
                 
     # 6o) Wilting point    
     if Soil_moisture_wilting_point_kind_of_data == 1:
@@ -1092,7 +1086,7 @@ def SEBALcode(number,inputExcel):
             Soil_moisture_wilting_point_fileName = os.path.join(output_folder, 'Output_temporary','Soil_moisture_wilting_point_input.tif')
             Soil_moisture_wilting_point=Reshape_Reproject_Input_data(Soil_moisture_wilting_point_name,Soil_moisture_wilting_point_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the wilting point input path in the soil excel tab') 
+            print('ERROR: Check the wilting point input path in the soil CSV data') 
 
     # 6p) Fraction field capacity        
     if Field_Capacity_kind_of_data == 1:
@@ -1100,7 +1094,7 @@ def SEBALcode(number,inputExcel):
             Field_Capacity_fileName = os.path.join(output_folder, 'Output_temporary','Fraction_Field_Capacity_and_Saturation_input.tif')
             Field_Capacity=Reshape_Reproject_Input_data(Field_Capacity_name,Field_Capacity_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the field capacity input path in the soil excel tab') 
+            print('ERROR: Check the field capacity input path in the soil CSV data') 
 
     # 6q) Light Use Efficiency        
     if LUEmax_kind_of_data == 1:
@@ -1108,7 +1102,7 @@ def SEBALcode(number,inputExcel):
             LUEmax_fileName = os.path.join(output_folder, 'Output_temporary','LUEmax_input.tif')
             LUEmax=Reshape_Reproject_Input_data(LUEmax_name,LUEmax_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the LUE input path in the soil excel tab') 
+            print('ERROR: Check the LUE input path in the soil CSV data') 
 
     # 6r) Obstacle height      						
     if h_obst_kind_of_data == 1:
@@ -1116,7 +1110,7 @@ def SEBALcode(number,inputExcel):
             h_obst_fileName = os.path.join(output_folder, 'Output_temporary','h_obst_input.tif')
             h_obst=Reshape_Reproject_Input_data(h_obst_name,h_obst_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the obstacle height input path in the soil excel tab') 
+            print('ERROR: Check the obstacle height input path in the soil CSV data') 
  
     # 6s) deplection factor      						
     if depl_factor_kind_of_data == 1:
@@ -1124,7 +1118,7 @@ def SEBALcode(number,inputExcel):
             depl_factor_fileName = os.path.join(output_folder, 'Output_temporary','depl_factor_input.tif')
             depl_factor=Reshape_Reproject_Input_data(depl_factor_name,depl_factor_fileName,proyDEM_fileName)
         except:
-            print('ERROR: Check the depletion factor input path in the soil excel tab') 
+            print('ERROR: Check the depletion factor input path in the soil CSV data') 
 
     print('---------------------------------------------------------')
     print('-------------------- Meteo part 1 -----------------------')
@@ -1222,7 +1216,7 @@ def SEBALcode(number,inputExcel):
 
         # Open Landsat data only if all additional data is not defined.
 
-        # Open the Additional input excel sheet
+        # Open the Additional input CSV file
         ws = wb['Additional_Input']
 							
         # If all additional fields are filled in than do not open the Landsat data
@@ -1559,7 +1553,7 @@ def SEBALcode(number,inputExcel):
         print('------------------- Collect PROBA-V data ----------------')
         print('---------------------------------------------------------')
         
-        # Open the Additional input excel sheet
+        # Open the Additional input CSV file
         ws = wb['Additional_Input']
 							
         # If all additional fields are filled in than do not open the PROBA-V data

@@ -10,10 +10,8 @@ import pysebal_py3
 import traceback
 ##### USER INPUTS
 
-##### For Linux SET THE PATH TO INPUT EXCEL SHEET #####
-#inputExcel = r"/mnt/d/PySEBAL_dev/test_data/InputEXCEL_v3_3_7_LIN.xlsx"
-##### For Windows SET THE PATH TO INPUT EXCEL SHEET #####
-inputExcel = r"D:\PySEBAL_dev\test_data\InputEXCEL_v3_3_7_WIN.xlsx"
+##### SET THE PATH TO INPUT CSV FILE #####
+inputCSV = r"sample_input_timeseries.csv"
 st = 2 # starting row number
 en = 2 # ending row number
 
@@ -22,7 +20,7 @@ en = 2 # ending row number
 for number in range(st, en + 1):
     try:
         print ('starting line num: %d' % number)
-        pysebal_py3.SEBALcode(number,inputExcel)
+        pysebal_py3.SEBALcode(number,inputCSV)
         print ('line num: %d done' % number)   
     except:  # amir
         print ('--------------------\n')
