@@ -41,3 +41,5 @@ python run_timeseries.py my_data.csv 1 5
 Documentation on how to install, setup and run PySEBAL is provided here: https://pysebal.readthedocs.io/
 
 ## Contact
+*For questions, contact: [Onan Agaba](mailto:onanagaba@gmail.com)*
+
