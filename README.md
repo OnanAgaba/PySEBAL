@@ -2,7 +2,7 @@
 
 PySEBAL implements Surface Energy Balance Model for Land (SEBAL) in python to estimate spatially explicit Actual EvapoTranspiration maps from remotely sensed data. In addition the library also computes various outputs like Above Ground Biomass Production (AGBP) and Biomass Water Productivity AGBP is computed using fAPAR and LUE factors as inputs. The library is extensively tested on Landsat 7 and 8 data, however it should also support MODIS and PROBA-V/VIIRS. This library supports python 3 and run in both Windows and Linux operating systems.
 
-## NEW: CSV Input for Timeseries Processing
+## PySEBAL modified to run on CSV Input for Timeseries Processing
 
 PySEBAL now supports **CSV input files** for automated timeseries evapotranspiration calculations! This feature enables:
 
