@@ -9,6 +9,9 @@ PySEBAL_dev_v3.8
 
 @author Sajid Pareeth
         February 2020
+
+@author Onan Agaba
+        August 2025
 """
 #import pdb
 import platform
